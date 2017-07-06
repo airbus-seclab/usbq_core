@@ -1,0 +1,13 @@
+*.o
+*.ko
+*.symvers
+*.order
+*.mod.c
+.*.cmd
+cap
+\#*
+.#*
+test*
+run.sh
+monitor.py
+.tmp_versions
