@@ -196,7 +196,13 @@ import_single_range(int rw, void __user *buf, size_t len,
 {
    if (len > MAX_RW_COUNT)
       len = MAX_RW_COUNT;
+
+   // Type argument dropped in 5.0
+#if LINUX_VERSION_CODE < KERNEL_VERSION(5,0,0)
    if (unlikely(!access_ok(!rw, buf, len)))
+#else
+   if (unlikely(!access_ok(buf, len)))
+#endif
       return -EFAULT;
 
    iov->iov_base = buf;
@@ -248,7 +254,12 @@ raw_recv(udp_state_t *state, unsigned char *addr, size_t len)
    slog(state,DBG,"READING DATA");
    oldfs = get_fs();
    set_fs(KERNEL_DS);
-   size = sock_recvmsg(sock,&msg,len,msg.msg_flags);
+
+#if LINUX_VERSION_CODE < KERNEL_VERSION(4,7,1)
+   size = sock_recvmsg(sock, &msg, len, msg.msg_flags);
+#else
+   size = sock_recvmsg(sock, &msg, msg.msg_flags);
+#endif
    set_fs(oldfs);
 
    state->clientaddr = *(struct sockaddr_in *)msg.msg_name;
